@@ -4,9 +4,10 @@ spring:
     druid:
       db-type: com.alibaba.druid.pool.DruidDataSource
       driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${DB_USER:root}
-      password: ${DB_PWD:123456}
+      url: jdbc:log4jdbc:mysql://101.35.54.248:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: customer1
+      password: acc1235#A
+      # 主数据源，默认的
       # 初始连接数
       initial-size: 5
       # 最小连接数
