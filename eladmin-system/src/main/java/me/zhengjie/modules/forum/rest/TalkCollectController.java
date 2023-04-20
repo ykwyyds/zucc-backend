@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 **/
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "帖子收藏管理")
+@Api(tags = "2帖子收藏管理")
 @RequestMapping("/api/talkCollect")
 public class TalkCollectController {
 

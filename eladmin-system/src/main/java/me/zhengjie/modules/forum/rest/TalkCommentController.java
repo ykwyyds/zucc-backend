@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 **/
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "帖子评论管理")
+@Api(tags = "3帖子评论管理")
 @RequestMapping("/api/talkComment")
 public class TalkCommentController {
 

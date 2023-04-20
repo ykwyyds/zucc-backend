@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 **/
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "关注管理")
+@Api(tags = "4关注管理")
 @RequestMapping("/api/userAttention")
 public class UserAttentionController {
 
