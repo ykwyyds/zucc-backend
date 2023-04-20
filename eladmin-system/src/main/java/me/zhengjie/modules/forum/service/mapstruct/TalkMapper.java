@@ -32,5 +32,5 @@ import java.util.List;
 public interface TalkMapper extends BaseMapper<TalkDto, Talk> {
 
 
-
+//    TalkDto toDto1(TalkDto t);
 }

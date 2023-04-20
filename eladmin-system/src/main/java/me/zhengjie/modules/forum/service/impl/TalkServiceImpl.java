@@ -51,8 +51,9 @@ public class TalkServiceImpl implements TalkService {
     private final TalkMapper talkMapper;
 
     @Override
-    public Object page1(String searchStr, Pageable pageable) {
-        return talkRepository.page1(searchStr,pageable);
+    public Page<Map<String,Object>> page1(String searchStr, Pageable pageable) {
+        Page<Map<String,Object>> page=talkRepository.page1(searchStr,pageable);
+        return page;
     }
     @Override
     public Map<String,Object> queryAll(TalkQueryCriteria criteria, Pageable pageable){

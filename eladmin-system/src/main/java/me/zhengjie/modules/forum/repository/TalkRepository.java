@@ -26,6 +26,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @website https://eladmin.vip
@@ -43,5 +44,5 @@ public interface TalkRepository extends JpaRepository<Talk, Long>, JpaSpecificat
     @Query(value="select t.*,u.username,u.nick_name as nickName from talk t ,sys_user u where if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1) and u.user_id=t.user_id",
             countQuery ="select count(id) from talk t where where if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1)",nativeQuery = true
     )
-    Page page1(@Param("searchStr") String searchStr, Pageable pageable);
+    Page<Map<String,Object>> page1(@Param("searchStr") String searchStr, Pageable pageable);
 }
