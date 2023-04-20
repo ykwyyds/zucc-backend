@@ -85,6 +85,13 @@ public class Course implements Serializable {
     @ApiModelProperty(value = "updateTime")
     private Timestamp updateTime;
 
+    @Column(name = "`teacher`")
+    @ApiModelProperty(value = "授课老师")
+    private String teacher;
+
+    @Column(name = "`place`")
+    @ApiModelProperty(value = "上课地点")
+    private String place;
     public void copy(Course source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }
