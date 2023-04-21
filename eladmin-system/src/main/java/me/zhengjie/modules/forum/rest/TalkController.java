@@ -19,6 +19,7 @@ import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.forum.domain.Talk;
 import me.zhengjie.modules.forum.service.TalkService;
 import me.zhengjie.modules.forum.service.dto.TalkQueryCriteria;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,9 @@ public class TalkController {
     @Log("分页查询帖子")
     @ApiOperation("分页查询帖子")
     public ResponseEntity<Object> page1(String searchStr, Pageable pageable){
+        if(StringUtils.isEmpty(searchStr)){
+            searchStr="";
+        }
         return new ResponseEntity<>(talkService.page1(searchStr,pageable),HttpStatus.OK);
     }
 //    @GetMapping

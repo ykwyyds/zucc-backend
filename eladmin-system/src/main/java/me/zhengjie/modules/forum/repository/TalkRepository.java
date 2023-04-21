@@ -41,8 +41,8 @@ public interface TalkRepository extends JpaRepository<Talk, Long>, JpaSpecificat
 //    List<TalkDto> pageList(@Param("searchStr") String searchStr);
 //    @Query(value ="select count(id) from Talk where title like concat('%',:#{criteria.searchStr},'%')",
 //            countQuery="select t,u.username,u.nickName from Talk t ,User u where t.title like concat('%',:#{criteria.searchStr},'%')"
-    @Query(value="select t.*,u.username,u.nick_name as nickName from talk t ,sys_user u where if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1) and u.user_id=t.user_id",
-            countQuery ="select count(id) from talk t where where if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1)",nativeQuery = true
+    @Query(value="select t.*,u.username,u.nick_name as nickname from talk t ,sys_user u where if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1) and u.user_id=t.user_id",
+            countQuery ="select count(id) from talk t where  if(:searchStr !='',t.title like concat('%',:searchStr,'%'),1=1)",nativeQuery = true
     )
     Page<Map<String,Object>> page1(@Param("searchStr") String searchStr, Pageable pageable);
 }
