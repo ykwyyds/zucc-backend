@@ -61,17 +61,6 @@ public class Talk implements Serializable {
     @ApiModelProperty(value = "是否匿名发帖，1-匿名，0-不匿名")
     private Integer isAnonymous;
 
-    @Column(name = "`agree_total`")
-    @ApiModelProperty(value = "点赞数")
-    private Integer agreeTotal;
-
-    @Column(name = "`collect_total`")
-    @ApiModelProperty(value = "收藏数")
-    private Integer collectTotal;
-
-    @Column(name = "`comment_total`")
-    @ApiModelProperty(value = "评论数")
-    private Integer commentTotal;
 
     @Column(name = "`create_by`")
     @ApiModelProperty(value = "创建人用户名")

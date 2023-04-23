@@ -13,28 +13,23 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package me.zhengjie.modules.forum.service;
+package me.zhengjie.modules.forum.repository;
 
+import me.zhengjie.modules.forum.domain.TalkAgree;
 import me.zhengjie.modules.forum.domain.TalkCollect;
-import me.zhengjie.modules.forum.service.dto.TalkCollectDto;
-import me.zhengjie.modules.forum.service.dto.TalkCollectQueryCriteria;
-import org.springframework.data.domain.Pageable;
-import java.util.Map;
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
 * @website https://eladmin.vip
-* @description 服务接口
 * @author cuican
 * @date 2023-04-20
 **/
-public interface TalkCollectService {
-
-
-
-    Object collect(Long id);
-
-    Object cancel(Long id);
+public interface TalkAgreeRepository extends JpaRepository<TalkAgree, Long>, JpaSpecificationExecutor<TalkAgree> {
+    @Query(value = "select t.* from talk_agree t where t.user_id=:userId and talk_id=:talkId "
+            , nativeQuery = true
+    )
+    TalkAgree getByUserAndTalk(@Param("talkId") Long talkId,@Param("userId")  Long userId);
 }

@@ -18,6 +18,8 @@ package me.zhengjie.modules.forum.repository;
 import me.zhengjie.modules.forum.domain.TalkCollect;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
 * @website https://eladmin.vip
@@ -25,4 +27,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 * @date 2023-04-20
 **/
 public interface TalkCollectRepository extends JpaRepository<TalkCollect, Long>, JpaSpecificationExecutor<TalkCollect> {
+    @Query(value = "select t.* from talk_collect t where t.user_id=:userId and talk_id=:talkId "
+            , nativeQuery = true
+    )
+    TalkCollect getByUserAndTalk(@Param("talkId") Long talkId,@Param("userId")  Long userId);
 }

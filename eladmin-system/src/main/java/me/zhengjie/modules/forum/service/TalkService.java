@@ -15,6 +15,7 @@
 */
 package me.zhengjie.modules.forum.service;
 
+import me.zhengjie.base.PageDTO;
 import me.zhengjie.modules.forum.domain.Talk;
 import me.zhengjie.modules.forum.service.dto.TalkDto;
 import me.zhengjie.modules.forum.service.dto.TalkQueryCriteria;
@@ -76,7 +77,7 @@ public interface TalkService {
     void deleteAll(Long[] ids);
 
 
-    Object page1(String searchStr, Pageable pageable);
+    PageDTO page1(String searchStr, Pageable pageable);
 
     Talk getById(Long id);
 

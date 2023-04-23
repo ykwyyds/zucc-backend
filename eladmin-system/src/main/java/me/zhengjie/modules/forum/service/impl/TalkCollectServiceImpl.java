@@ -15,9 +15,10 @@
 */
 package me.zhengjie.modules.forum.service.impl;
 
+import me.zhengjie.exception.BusinessException;
 import me.zhengjie.modules.forum.domain.TalkCollect;
-import me.zhengjie.utils.ValidationUtil;
-import me.zhengjie.utils.FileUtil;
+import me.zhengjie.modules.forum.repository.TalkRepository;
+import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.TalkCollectRepository;
 import me.zhengjie.modules.forum.service.TalkCollectService;
@@ -28,14 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import me.zhengjie.utils.PageUtil;
-import me.zhengjie.utils.QueryHelp;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @website https://eladmin.vip
@@ -49,61 +46,29 @@ public class TalkCollectServiceImpl implements TalkCollectService {
 
     private final TalkCollectRepository talkCollectRepository;
     private final TalkCollectMapper talkCollectMapper;
+    private final TalkRepository talkRepository;
 
     @Override
-    public Map<String,Object> queryAll(TalkCollectQueryCriteria criteria, Pageable pageable){
-        Page<TalkCollect> page = talkCollectRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(talkCollectMapper::toDto));
-    }
-
-    @Override
-    public List<TalkCollectDto> queryAll(TalkCollectQueryCriteria criteria){
-        return talkCollectMapper.toDto(talkCollectRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
-    }
-
-    @Override
-    @Transactional
-    public TalkCollectDto findById(Long id) {
-        TalkCollect talkCollect = talkCollectRepository.findById(id).orElseGet(TalkCollect::new);
-        ValidationUtil.isNull(talkCollect.getId(),"TalkCollect","id",id);
-        return talkCollectMapper.toDto(talkCollect);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public TalkCollectDto create(TalkCollect resources) {
-        return talkCollectMapper.toDto(talkCollectRepository.save(resources));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(TalkCollect resources) {
-        TalkCollect talkCollect = talkCollectRepository.findById(resources.getId()).orElseGet(TalkCollect::new);
-        ValidationUtil.isNull( talkCollect.getId(),"TalkCollect","id",resources.getId());
-        talkCollect.copy(resources);
-        talkCollectRepository.save(talkCollect);
-    }
-
-    @Override
-    public void deleteAll(Long[] ids) {
-        for (Long id : ids) {
-            talkCollectRepository.deleteById(id);
+    public Object collect(Long talkId) {
+        Long userId= SecurityUtils.getCurrentUserId();
+        if(userId==null){
+            throw new BusinessException("请先登录。");
         }
+        TalkCollect t=talkCollectRepository.getByUserAndTalk(talkId,userId);
+        if(t!=null){
+            throw new BusinessException("您已收藏过该帖子。");
+        }
+        TalkCollect c=new TalkCollect();
+        c.setCreateBy(SecurityUtils.getCurrentUsername());
+        c.setUpdateBy(c.getCreateBy());
+        c.setTalkId(talkId);
+        c.setUserId(userId);
+        talkCollectRepository.save(c);
+        return c;
     }
 
     @Override
-    public void download(List<TalkCollectDto> all, HttpServletResponse response) throws IOException {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (TalkCollectDto talkCollect : all) {
-            Map<String,Object> map = new LinkedHashMap<>();
-            map.put("收藏者id", talkCollect.getUserId());
-            map.put("帖子id", talkCollect.getTalkId());
-            map.put(" createBy",  talkCollect.getCreateBy());
-            map.put(" updateBy",  talkCollect.getUpdateBy());
-            map.put(" createTime",  talkCollect.getCreateTime());
-            map.put(" updateTime",  talkCollect.getUpdateTime());
-            list.add(map);
-        }
-        FileUtil.downloadExcel(list, response);
+    public Object cancel(Long talkId) {
+        return null;
     }
 }

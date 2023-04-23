@@ -46,14 +46,6 @@ public class TalkDto implements Serializable {
     /** 是否匿名发帖，1-匿名，0-不匿名 */
     private Integer isAnonymous;
 
-    /** 点赞数 */
-    private Integer agreeTotal;
-
-    /** 收藏数 */
-    private Integer collectTotal;
-
-    /** 评论数 */
-    private Integer commentTotal;
 
     /** 创建人用户名 */
     private String createBy;

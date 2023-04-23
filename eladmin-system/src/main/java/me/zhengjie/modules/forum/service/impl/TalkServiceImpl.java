@@ -15,9 +15,16 @@
 */
 package me.zhengjie.modules.forum.service.impl;
 
+import me.zhengjie.base.CommonConstant;
+import me.zhengjie.base.PageDTO;
 import me.zhengjie.config.FileProperties;
 import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.forum.domain.Talk;
+import me.zhengjie.modules.forum.domain.TalkAgree;
+import me.zhengjie.modules.forum.domain.TalkCollect;
+import me.zhengjie.modules.forum.domain.TalkComment;
+import me.zhengjie.modules.forum.repository.TalkAgreeRepository;
+import me.zhengjie.modules.forum.repository.TalkCollectRepository;
 import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -49,11 +57,51 @@ import javax.validation.constraints.NotBlank;
 public class TalkServiceImpl implements TalkService {
 
     private final TalkRepository talkRepository;
+    private final TalkCollectRepository talkCollectRepository;
+    private final TalkAgreeRepository talkAgreeRepository;
     private final TalkMapper talkMapper;
     @Override
-    public Page<Map<String,Object>> page1(String searchStr, Pageable pageable) {
+    public PageDTO page1(String searchStr, Pageable pageable) {
         Page<Map<String,Object>> page=talkRepository.page1(searchStr,pageable);
-        return page;
+        List<Map<String,Object>> list=page.getContent();
+        List<Map<String,Object>> newList=new ArrayList<>();
+        Long userId=null;
+        if(SecurityUtils.getCurrentUser()!=null){
+            userId=SecurityUtils.getCurrentUserId();
+        }
+        for (int i = 0; i <list.size() ; i++) {
+            Map<String,Object> oldMap=list.get(i);
+            Map<String,Object> map=new HashMap<>();
+            map.putAll(oldMap);
+            if(map.get("imgs")==null){
+                map.put("imgs","");
+            }
+            if(map.get("isAnonymous")!=null && !"".equals(map.get("isAnonymous")+"") && Integer.parseInt(map.get("isAnonymous")+"")== CommonConstant.YES){
+                map.put("username","匿名用户");
+                map.put("nickName","******");
+                map.put("avatarPath","");
+            }
+            map.put("isAgree",CommonConstant.NO);
+            map.put("isCollect",CommonConstant.NO);
+            //查询当前帖子是否被当前用户点赞、收藏
+            if(userId!=null){
+                Long id= ((BigInteger) map.get("id")).longValue();//帖子id
+                TalkAgree agree=talkAgreeRepository.getByUserAndTalk(id,userId);
+                TalkCollect collect=talkCollectRepository.getByUserAndTalk(id,userId);
+                if(agree!=null){
+                    map.put("isAgree",CommonConstant.YES);
+                }
+                if(collect!=null){
+                    map.put("isCollect",CommonConstant.YES);
+                }
+            }
+
+            newList.add(i,map);
+        }
+        PageDTO newPage=new PageDTO();
+        newPage.setContent(newList);
+        newPage.setTotalElements(page.getTotalElements());
+        return newPage;
     }
 
     @Override
@@ -89,6 +137,7 @@ public class TalkServiceImpl implements TalkService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TalkDto create(Talk resources) {
+        resources.setUserId(SecurityUtils.getCurrentUserId());
         return talkMapper.toDto(talkRepository.save(resources));
     }
 

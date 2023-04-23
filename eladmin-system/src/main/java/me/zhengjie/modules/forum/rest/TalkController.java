@@ -66,14 +66,14 @@ public class TalkController {
     @PostMapping("/add")
     @ApiOperation("2新增帖子")
     public ResponseEntity<Object> add(@Validated @RequestBody Talk resources){
-        return new ResponseEntity<>(talkService.create(resources),HttpStatus.CREATED);
+        return new ResponseEntity<>(talkService.create(resources),HttpStatus.OK);
     }
 
     @PutMapping("/edit")
     @ApiOperation("4修改帖子")
     public ResponseEntity<Object> edit(@Validated @RequestBody Talk resources){
         talkService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/del")
