@@ -18,6 +18,7 @@ package me.zhengjie.modules.forum.rest;
 import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.forum.domain.TalkComment;
 import me.zhengjie.modules.forum.service.TalkCommentService;
+import me.zhengjie.modules.forum.service.dto.TalkCommentDto;
 import me.zhengjie.modules.forum.service.dto.TalkCommentQueryCriteria;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -48,8 +51,16 @@ public class TalkCommentController {
             @ApiImplicitParam(name="talkId",value="帖子id",type = "Long"),
             @ApiImplicitParam(name="content",value="评论内容",type = "String")
     })
-
     public ResponseEntity<Object> add(Long talkId,String content){
         return new ResponseEntity<>(talkCommentService.add(talkId,content),HttpStatus.OK);
+    }
+
+    @GetMapping("/add")
+    @ApiOperation("2.评论列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="talkId",value="帖子id",type = "Long"),
+    })
+    public ResponseEntity<List<Map<String,Object>>> list(Long talkId){
+        return new ResponseEntity<List<Map<String,Object>>>(talkCommentService.list(talkId),HttpStatus.OK);
     }
 }

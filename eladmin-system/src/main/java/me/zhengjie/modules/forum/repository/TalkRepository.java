@@ -34,7 +34,8 @@ import java.util.Map;
  * @date 2023-04-19
  **/
 public interface TalkRepository extends JpaRepository<Talk, Long>, JpaSpecificationExecutor<Talk> {
-    @Query(value = "select t.id as id ,t.user_id as userId,t.title,t.subject,t.content,t.is_anonymous as isAnonymous,t.create_time as createTime,u.username,u.nick_name as nickname,u.avatar_path as avatarPath," +
+    @Query(value = "select t.id as id ,t.user_id as userId,t.title,t.subject,t.content,t.is_anonymous as isAnonymous,t.create_time as createTime," +
+            "u.username,u.nick_name as nickname,u.avatar_path as avatarPath," +
             "ifnull(a.agreeTotal,0 ) as agreeTotal,ifnull(c.commenTotal,0) as commenTotal ,ifnull(c1.collectTotal,0) as collectTotal " +
             "from talk t inner join sys_user u on u.user_id=t.user_id " +
             "left join (select count(id) as agreeTotal,talk_id from talk_agree group by  talk_id)a on a.talk_id=t.id "+

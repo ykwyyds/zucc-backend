@@ -15,6 +15,11 @@
 */
 package me.zhengjie.modules.forum.service;
 
+import me.zhengjie.modules.forum.service.dto.TalkCommentDto;
+
+import java.util.List;
+import java.util.Map;
+
 /**
 * @website https://eladmin.vip
 * @description 服务接口
@@ -24,4 +29,6 @@ package me.zhengjie.modules.forum.service;
 public interface TalkCommentService {
 
     Object add(Long talkId, String content);
+
+    List<Map<String,Object>> list(Long talkId);
 }

@@ -16,6 +16,7 @@
 package me.zhengjie.modules.forum.service.impl;
 
 import me.zhengjie.modules.forum.domain.TalkComment;
+import me.zhengjie.modules.forum.service.dto.TalkCommentDto;
 import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.TalkCommentRepository;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @website https://eladmin.vip
@@ -52,5 +55,10 @@ public class TalkCommentServiceImpl implements TalkCommentService {
         c.setTalkId(talkId);
         talkCommentRepository.save(c);
         return c;
+    }
+
+    @Override
+    public List<Map<String,Object>> list(Long talkId) {
+        return talkCommentRepository.list(talkId);
     }
 }

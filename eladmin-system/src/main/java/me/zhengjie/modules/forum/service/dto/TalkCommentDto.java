@@ -50,4 +50,8 @@ public class TalkCommentDto implements Serializable {
     private Timestamp createTime;
 
     private Timestamp updateTime;
+
+    private String nickName;
+    private String username;
+    private String avatarPath;
 }
