@@ -15,9 +15,11 @@
 */
 package me.zhengjie.modules.forum.service.impl;
 
+import me.zhengjie.config.FileProperties;
+import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.forum.domain.Talk;
-import me.zhengjie.utils.ValidationUtil;
-import me.zhengjie.utils.FileUtil;
+import me.zhengjie.modules.system.domain.User;
+import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.TalkRepository;
 import me.zhengjie.modules.forum.service.TalkService;
@@ -28,14 +30,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import me.zhengjie.utils.PageUtil;
-import me.zhengjie.utils.QueryHelp;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import javax.validation.constraints.NotBlank;
 
 /**
 * @website https://eladmin.vip
@@ -49,12 +50,23 @@ public class TalkServiceImpl implements TalkService {
 
     private final TalkRepository talkRepository;
     private final TalkMapper talkMapper;
-
     @Override
     public Page<Map<String,Object>> page1(String searchStr, Pageable pageable) {
         Page<Map<String,Object>> page=talkRepository.page1(searchStr,pageable);
         return page;
     }
+
+    @Override
+    public Talk getById(Long id) {
+        return talkRepository.getById(id);
+    }
+
+    @Override
+    public List<String> hotSubjectList() {
+        return talkRepository.hotSubjectList();
+    }
+
+
     @Override
     public Map<String,Object> queryAll(TalkQueryCriteria criteria, Pageable pageable){
         Page<Talk> page = talkRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
@@ -96,28 +108,6 @@ public class TalkServiceImpl implements TalkService {
         }
     }
 
-    @Override
-    public void download(List<TalkDto> all, HttpServletResponse response) throws IOException {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (TalkDto talk : all) {
-            Map<String,Object> map = new LinkedHashMap<>();
-            map.put("发帖人id", talk.getUserId());
-            map.put("帖子标题", talk.getTitle());
-            map.put("帖子所属话题", talk.getSubject());
-            map.put("帖子内容", talk.getContent());
-            map.put("是否匿名发帖，1-匿名，0-不匿名", talk.getIsAnonymous());
-            map.put("点赞数", talk.getAgreeTotal());
-            map.put("收藏数", talk.getCollectTotal());
-            map.put("评论数", talk.getCommentTotal());
-            map.put("创建人用户名", talk.getCreateBy());
-            map.put("更新人用户名", talk.getUpdateBy());
-            map.put("创建时间", talk.getCreateTime());
-            map.put("更新时间", talk.getUpdateTime());
-            map.put("0-非热门，1-热门", talk.getIsHot());
-            list.add(map);
-        }
-        FileUtil.downloadExcel(list, response);
-    }
 
 
 }

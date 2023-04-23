@@ -28,6 +28,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,9 +46,10 @@ public class TalkController {
 
     private final TalkService talkService;
 
-    @GetMapping
-    @Log("分页查询帖子")
-    @ApiOperation("分页查询帖子")
+
+    @GetMapping("/page")
+    @ApiOperation("1.分页查询；根据关键词、话题搜索帖子")
+    @ApiImplicitParam(name="searchStr",value="搜索条件：关键字")
     public ResponseEntity<Object> page1(String searchStr, Pageable pageable){
         if(StringUtils.isEmpty(searchStr)){
             searchStr="";
@@ -60,29 +63,35 @@ public class TalkController {
 //        return new ResponseEntity<>(talkService.queryAll(criteria,pageable),HttpStatus.OK);
 //    }
 
-    @PostMapping
-    @Log("新增帖子")
-    @ApiOperation("新增帖子")
-    @PreAuthorize("@el.check('talk:add')")
-    public ResponseEntity<Object> createTalk(@Validated @RequestBody Talk resources){
+    @PostMapping("/add")
+    @ApiOperation("2新增帖子")
+    public ResponseEntity<Object> add(@Validated @RequestBody Talk resources){
         return new ResponseEntity<>(talkService.create(resources),HttpStatus.CREATED);
     }
 
-    @PutMapping
-    @Log("修改帖子")
-    @ApiOperation("修改帖子")
-    @PreAuthorize("@el.check('talk:edit')")
-    public ResponseEntity<Object> updateTalk(@Validated @RequestBody Talk resources){
+    @PutMapping("/edit")
+    @ApiOperation("4修改帖子")
+    public ResponseEntity<Object> edit(@Validated @RequestBody Talk resources){
         talkService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping
-    @Log("删除帖子")
-    @ApiOperation("删除帖子")
-    @PreAuthorize("@el.check('talk:del')")
-    public ResponseEntity<Object> deleteTalk(@RequestBody Long[] ids) {
+    @DeleteMapping("/del")
+    @ApiOperation("5删除帖子")
+    public ResponseEntity<Object> del(@RequestBody Long[] ids) {
         talkService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/getById")
+    @ApiOperation("3根据id查询帖子信息")
+    public ResponseEntity<Object> getById(Long id) {
+        return new ResponseEntity<>(talkService.getById(id),HttpStatus.OK);
+    }
+
+    @GetMapping("/hotSubjectList")
+    @ApiOperation("6.热门话题/话题列表")
+    public ResponseEntity<Object> hotSubjectList() {
+        return new ResponseEntity<>(talkService.hotSubjectList(),HttpStatus.OK);
     }
 }

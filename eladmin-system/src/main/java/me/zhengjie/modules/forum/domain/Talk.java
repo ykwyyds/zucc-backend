@@ -93,6 +93,10 @@ public class Talk implements Serializable {
     @ApiModelProperty(value = "0-非热门，1-热门")
     private Integer isHot;
 
+    @Column(name = "`imgs`")
+    @ApiModelProperty(value = "图片，多个图片用;分隔")
+    private String imgs;
+
     public void copy(Talk source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
     }

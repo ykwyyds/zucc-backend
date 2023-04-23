@@ -19,6 +19,8 @@ import me.zhengjie.modules.forum.domain.Talk;
 import me.zhengjie.modules.forum.service.dto.TalkDto;
 import me.zhengjie.modules.forum.service.dto.TalkQueryCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 import java.util.List;
 import java.io.IOException;
@@ -73,13 +75,10 @@ public interface TalkService {
     */
     void deleteAll(Long[] ids);
 
-    /**
-    * 导出数据
-    * @param all 待导出的数据
-    * @param response /
-    * @throws IOException /
-    */
-    void download(List<TalkDto> all, HttpServletResponse response) throws IOException;
 
     Object page1(String searchStr, Pageable pageable);
+
+    Talk getById(Long id);
+
+    List<String> hotSubjectList();
 }
