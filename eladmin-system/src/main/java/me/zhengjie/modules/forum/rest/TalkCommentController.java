@@ -37,51 +37,19 @@ import javax.servlet.http.HttpServletResponse;
 **/
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "3帖子评论管理")
+@Api(tags = "3帖子评论")
 @RequestMapping("/api/talkComment")
 public class TalkCommentController {
 
     private final TalkCommentService talkCommentService;
+    @PostMapping("/add")
+    @ApiOperation("1.评论帖子")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="talkId",value="帖子id",type = "Long"),
+            @ApiImplicitParam(name="content",value="评论内容",type = "String")
+    })
 
-    @Log("导出数据")
-    @ApiOperation("导出数据")
-    @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('talkComment:list')")
-    public void exportTalkComment(HttpServletResponse response, TalkCommentQueryCriteria criteria) throws IOException {
-        talkCommentService.download(talkCommentService.queryAll(criteria), response);
-    }
-
-    @GetMapping
-    @Log("查询帖子评论")
-    @ApiOperation("查询帖子评论")
-    @PreAuthorize("@el.check('talkComment:list')")
-    public ResponseEntity<Object> queryTalkComment(TalkCommentQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(talkCommentService.queryAll(criteria,pageable),HttpStatus.OK);
-    }
-
-    @PostMapping
-    @Log("新增帖子评论")
-    @ApiOperation("新增帖子评论")
-    @PreAuthorize("@el.check('talkComment:add')")
-    public ResponseEntity<Object> createTalkComment(@Validated @RequestBody TalkComment resources){
-        return new ResponseEntity<>(talkCommentService.create(resources),HttpStatus.CREATED);
-    }
-
-    @PutMapping
-    @Log("修改帖子评论")
-    @ApiOperation("修改帖子评论")
-    @PreAuthorize("@el.check('talkComment:edit')")
-    public ResponseEntity<Object> updateTalkComment(@Validated @RequestBody TalkComment resources){
-        talkCommentService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @DeleteMapping
-    @Log("删除帖子评论")
-    @ApiOperation("删除帖子评论")
-    @PreAuthorize("@el.check('talkComment:del')")
-    public ResponseEntity<Object> deleteTalkComment(@RequestBody Long[] ids) {
-        talkCommentService.deleteAll(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Object> add(Long talkId,String content){
+        return new ResponseEntity<>(talkCommentService.add(talkId,content),HttpStatus.OK);
     }
 }

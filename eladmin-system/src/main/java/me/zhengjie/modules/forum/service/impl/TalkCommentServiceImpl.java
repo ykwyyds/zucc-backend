@@ -16,26 +16,15 @@
 package me.zhengjie.modules.forum.service.impl;
 
 import me.zhengjie.modules.forum.domain.TalkComment;
-import me.zhengjie.utils.ValidationUtil;
-import me.zhengjie.utils.FileUtil;
+import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.TalkCommentRepository;
 import me.zhengjie.modules.forum.service.TalkCommentService;
-import me.zhengjie.modules.forum.service.dto.TalkCommentDto;
-import me.zhengjie.modules.forum.service.dto.TalkCommentQueryCriteria;
 import me.zhengjie.modules.forum.service.mapstruct.TalkCommentMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import me.zhengjie.utils.PageUtil;
-import me.zhengjie.utils.QueryHelp;
-import java.util.List;
-import java.util.Map;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
 * @website https://eladmin.vip
@@ -51,61 +40,17 @@ public class TalkCommentServiceImpl implements TalkCommentService {
     private final TalkCommentMapper talkCommentMapper;
 
     @Override
-    public Map<String,Object> queryAll(TalkCommentQueryCriteria criteria, Pageable pageable){
-        Page<TalkComment> page = talkCommentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(talkCommentMapper::toDto));
-    }
-
-    @Override
-    public List<TalkCommentDto> queryAll(TalkCommentQueryCriteria criteria){
-        return talkCommentMapper.toDto(talkCommentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
-    }
-
-    @Override
-    @Transactional
-    public TalkCommentDto findById(Long id) {
-        TalkComment talkComment = talkCommentRepository.findById(id).orElseGet(TalkComment::new);
-        ValidationUtil.isNull(talkComment.getId(),"TalkComment","id",id);
-        return talkCommentMapper.toDto(talkComment);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public TalkCommentDto create(TalkComment resources) {
-        return talkCommentMapper.toDto(talkCommentRepository.save(resources));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(TalkComment resources) {
-        TalkComment talkComment = talkCommentRepository.findById(resources.getId()).orElseGet(TalkComment::new);
-        ValidationUtil.isNull( talkComment.getId(),"TalkComment","id",resources.getId());
-        talkComment.copy(resources);
-        talkCommentRepository.save(talkComment);
-    }
-
-    @Override
-    public void deleteAll(Long[] ids) {
-        for (Long id : ids) {
-            talkCommentRepository.deleteById(id);
-        }
-    }
-
-    @Override
-    public void download(List<TalkCommentDto> all, HttpServletResponse response) throws IOException {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (TalkCommentDto talkComment : all) {
-            Map<String,Object> map = new LinkedHashMap<>();
-            map.put("帖子id", talkComment.getTalkId());
-            map.put("父评论id，可能为空", talkComment.getPId());
-            map.put("发表评论者id", talkComment.getUserId());
-            map.put("评论内容", talkComment.getContent());
-            map.put(" createBy",  talkComment.getCreateBy());
-            map.put(" updateBy",  talkComment.getUpdateBy());
-            map.put(" createTime",  talkComment.getCreateTime());
-            map.put(" updateTime",  talkComment.getUpdateTime());
-            list.add(map);
-        }
-        FileUtil.downloadExcel(list, response);
+    public Object add(Long talkId, String content) {
+        Long userId= SecurityUtils.getCurrentUserId();
+        TalkComment c=new TalkComment();
+        c.setContent(content);
+        c.setCreateBy(SecurityUtils.getCurrentUsername());
+        c.setCreateTime(new Timestamp(new Date().getTime()));
+        c.setUpdateBy(c.getCreateBy());
+        c.setUpdateTime(c.getCreateTime());
+        c.setUserId(userId);
+        c.setTalkId(talkId);
+        talkCommentRepository.save(c);
+        return c;
     }
 }

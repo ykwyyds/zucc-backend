@@ -34,18 +34,20 @@ import java.util.Map;
  * @date 2023-04-19
  **/
 public interface TalkRepository extends JpaRepository<Talk, Long>, JpaSpecificationExecutor<Talk> {
-    @Query(value = "select t.id as id ,t.user_id as userId,t.title,t.subject,t.content,t.is_anonymous as isAnonymous,u.username,u.nick_name as nickname,u.avatar_path as avatarPath," +
+    @Query(value = "select t.id as id ,t.user_id as userId,t.title,t.subject,t.content,t.is_anonymous as isAnonymous,t.create_time as createTime,u.username,u.nick_name as nickname,u.avatar_path as avatarPath," +
             "ifnull(a.agreeTotal,0 ) as agreeTotal,ifnull(c.commenTotal,0) as commenTotal ,ifnull(c1.collectTotal,0) as collectTotal " +
             "from talk t inner join sys_user u on u.user_id=t.user_id " +
             "left join (select count(id) as agreeTotal,talk_id from talk_agree group by  talk_id)a on a.talk_id=t.id "+
             "left join (select count(id) as commenTotal,talk_id from talk_comment group by  talk_id)c on c.talk_id=t.id " +
             "left join (select count(id) as collectTotal,talk_id from talk_collect group by  talk_id)c1 on c1.talk_id=t.id " +
             "where 1=1 " +
-            "and (if(:searchStr !='',t.title like concat('%',:searchStr,'%') or t.subject like concat('%',:searchStr,'%') ,1=1)) ",
+            "and (if(:searchStr !='',t.title like concat('%',:searchStr,'%') or t.subject like concat('%',:searchStr,'%') ,1=1)) " +
+            "and (if(ifnull(:searchUserId,'')!='',t.user_id=:searchUserId,1=1)) ",
             countQuery = "select count(id) from talk t where 1=1 " +
-                    "and (if(:searchStr !='',t.title like concat('%',:searchStr,'%') or t.subject like concat('%',:searchStr,'%'),1=1))", nativeQuery = true
+                    "and (if(:searchStr !='',t.title like concat('%',:searchStr,'%') or t.subject like concat('%',:searchStr,'%'),1=1)) " +
+                    "and (if(ifnull(:searchUserId,'')!='',t.user_id=:searchUserId,1=1)) ", nativeQuery = true
     )
-    Page<Map<String, Object>> page1(@Param("searchStr") String searchStr, Pageable pageable);
+    Page<Map<String, Object>> page1(@Param("searchStr") String searchStr,@Param("searchUserId")  Long searchUserId, Pageable pageable);
 
     @Query(value = "select distinct subject from talk " ,
             nativeQuery = true

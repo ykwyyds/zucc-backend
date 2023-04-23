@@ -22,6 +22,7 @@ import me.zhengjie.modules.forum.domain.TalkCollect;
 import me.zhengjie.modules.forum.service.TalkCollectService;
 import me.zhengjie.modules.forum.service.dto.TalkCollectQueryCriteria;
 import me.zhengjie.utils.SecurityUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -53,9 +54,18 @@ public class TalkCollectController {
     public ResponseEntity<Object> collect(Long talkId){
         return new ResponseEntity<>(talkCollectService.collect(talkId),HttpStatus.OK);
     }
+    @GetMapping("/myCollectPage")
+    @ApiOperation("2.我的收藏，分页")
+    @ApiImplicitParam(name="searchStr",value="搜索条件：关键字")
+    public ResponseEntity<Object> page1(String searchStr, Pageable pageable){
+        if(StringUtils.isEmpty(searchStr)){
+            searchStr="";
+        }
+        return new ResponseEntity<>(talkCollectService.myCollectPage(searchStr,pageable),HttpStatus.OK);
+    }
 
     @PostMapping("/cancel")
-    @ApiOperation("2.取消收藏")
+    @ApiOperation("3.取消收藏")
     @ApiImplicitParam(name="talkId",value="帖子id")
     public ResponseEntity<Object> cancel(Long talkId){
         return new ResponseEntity<>(talkCollectService.cancel(talkId),HttpStatus.OK);

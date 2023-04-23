@@ -15,6 +15,7 @@
 */
 package me.zhengjie.modules.forum.service;
 
+import me.zhengjie.base.PageDTO;
 import me.zhengjie.modules.forum.domain.TalkCollect;
 import me.zhengjie.modules.forum.service.dto.TalkCollectDto;
 import me.zhengjie.modules.forum.service.dto.TalkCollectQueryCriteria;
@@ -37,4 +38,6 @@ public interface TalkCollectService {
     Object collect(Long id);
 
     Object cancel(Long id);
+
+    PageDTO myCollectPage(String searchStr, Pageable pageable);
 }

@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-@Api(tags = "系统：用户管理")
+@Api(tags = "00系统：用户管理")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class UserController {
     private final RoleService roleService;
     private final VerifyService verificationCodeService;
 
-    @ApiOperation("导出用户数据")
+//    @ApiOperation("导出用户数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('user:list')")
     public void exportUser(HttpServletResponse response, UserQueryCriteria criteria) throws IOException {
@@ -102,29 +102,33 @@ public class UserController {
         return new ResponseEntity<>(PageUtil.toPage(null,0),HttpStatus.OK);
     }
 
-    @Log("新增用户")
-    @ApiOperation("新增用户")
-    @PostMapping
-    @PreAuthorize("@el.check('user:add')")
-    public ResponseEntity<Object> createUser(@Validated @RequestBody User resources){
-        checkLevel(resources);
+    @ApiOperation("1.新增用户")
+    @PostMapping("/createUser")
+//    @PreAuthorize("@el.check('user:add')")
+    public ResponseEntity<Object> createUser(@RequestBody User resources){
+//        checkLevel(resources);
         // 默认密码 123456
-        resources.setPassword(passwordEncoder.encode("123456"));
+        if(StringUtils.isEmpty(resources.getPassword())){
+            resources.setPassword(passwordEncoder.encode("123456"));
+        }else{
+            resources.setPassword(passwordEncoder.encode(resources.getPassword()));
+        }
+        resources.setEnabled(true);
+        resources.setIsAdmin(true);
         userService.create(resources);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>("注册成功。",HttpStatus.OK);
     }
 
-    @Log("修改用户")
-    @ApiOperation("修改用户")
+    @ApiOperation("2.修改用户")
     @PutMapping
-    @PreAuthorize("@el.check('user:edit')")
-    public ResponseEntity<Object> updateUser(@Validated(User.Update.class) @RequestBody User resources) throws Exception {
-        checkLevel(resources);
+//    @PreAuthorize("@el.check('user:edit')")
+    public ResponseEntity<Object> updateUser( @RequestBody User resources) throws Exception {
+//        checkLevel(resources);
         userService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("修改成功。",HttpStatus.OK);
     }
 
-    @Log("修改用户：个人中心")
+//    @Log("修改用户：个人中心")
     @ApiOperation("修改用户：个人中心")
     @PutMapping(value = "center")
     public ResponseEntity<Object> centerUser(@Validated(User.Update.class) @RequestBody User resources){

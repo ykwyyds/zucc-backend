@@ -20,12 +20,9 @@ import me.zhengjie.modules.forum.domain.Talk;
 import me.zhengjie.modules.forum.service.dto.TalkDto;
 import me.zhengjie.modules.forum.service.dto.TalkQueryCriteria;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
 
 /**
 * @website https://eladmin.vip
@@ -77,7 +74,7 @@ public interface TalkService {
     void deleteAll(Long[] ids);
 
 
-    PageDTO page1(String searchStr, Pageable pageable);
+    PageDTO page1(String searchStr, Long userId, Pageable pageable);
 
     Talk getById(Long id);
 

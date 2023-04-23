@@ -44,6 +44,16 @@ public class SecurityUtils {
         UserDetailsService userDetailsService = SpringContextHolder.getBean(UserDetailsService.class);
         return userDetailsService.loadUserByUsername(getCurrentUsername());
     }
+    public static UserDetails getLoginUser() {
+        UserDetailsService userDetailsService = SpringContextHolder.getBean(UserDetailsService.class);
+        UserDetails d=null;
+        try {
+            d=userDetailsService.loadUserByUsername(getCurrentUsername());
+        }catch (Exception e){
+        }
+        return d;
+
+    }
 
     /**
      * 获取系统用户名称

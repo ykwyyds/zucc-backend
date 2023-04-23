@@ -87,12 +87,12 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(resources.getUsername()) != null) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
-        if (userRepository.findByEmail(resources.getEmail()) != null) {
-            throw new EntityExistException(User.class, "email", resources.getEmail());
-        }
-        if (userRepository.findByPhone(resources.getPhone()) != null) {
-            throw new EntityExistException(User.class, "phone", resources.getPhone());
-        }
+//        if (userRepository.findByEmail(resources.getEmail()) != null) {
+//            throw new EntityExistException(User.class, "email", resources.getEmail());
+//        }
+//        if (userRepository.findByPhone(resources.getPhone()) != null) {
+//            throw new EntityExistException(User.class, "phone", resources.getPhone());
+//        }
         userRepository.save(resources);
     }
 
@@ -102,29 +102,29 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
         User user1 = userRepository.findByUsername(resources.getUsername());
-        User user2 = userRepository.findByEmail(resources.getEmail());
-        User user3 = userRepository.findByPhone(resources.getPhone());
+//        User user2 = userRepository.findByEmail(resources.getEmail());
+//        User user3 = userRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId())) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
-        if (user2 != null && !user.getId().equals(user2.getId())) {
-            throw new EntityExistException(User.class, "email", resources.getEmail());
-        }
-        if (user3 != null && !user.getId().equals(user3.getId())) {
-            throw new EntityExistException(User.class, "phone", resources.getPhone());
-        }
+//        if (user2 != null && !user.getId().equals(user2.getId())) {
+//            throw new EntityExistException(User.class, "email", resources.getEmail());
+//        }
+//        if (user3 != null && !user.getId().equals(user3.getId())) {
+//            throw new EntityExistException(User.class, "phone", resources.getPhone());
+//        }
         // 如果用户的角色改变
-        if (!resources.getRoles().equals(user.getRoles())) {
-            redisUtils.del(CacheKey.DATA_USER + resources.getId());
-            redisUtils.del(CacheKey.MENU_USER + resources.getId());
-            redisUtils.del(CacheKey.ROLE_AUTH + resources.getId());
-        }
-        // 修改部门会影响 数据权限
-        if (!Objects.equals(resources.getDept(),user.getDept())) {
-            redisUtils.del(CacheKey.DATA_USER + resources.getId());
-        }
+//        if (!resources.getRoles().equals(user.getRoles())) {
+//            redisUtils.del(CacheKey.DATA_USER + resources.getId());
+//            redisUtils.del(CacheKey.MENU_USER + resources.getId());
+//            redisUtils.del(CacheKey.ROLE_AUTH + resources.getId());
+//        }
+//        // 修改部门会影响 数据权限
+//        if (!Objects.equals(resources.getDept(),user.getDept())) {
+//            redisUtils.del(CacheKey.DATA_USER + resources.getId());
+//        }
         // 如果用户被禁用，则清除用户登录信息
-        if(!resources.getEnabled()){
+        if(resources.getEnabled()!=null && !resources.getEnabled()){
             onlineUserService.kickOutForUsername(resources.getUsername());
         }
         user.setUsername(resources.getUsername());

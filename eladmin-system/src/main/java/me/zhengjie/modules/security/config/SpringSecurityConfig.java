@@ -117,6 +117,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/file/**").permitAll()
                 // 阿里巴巴 druid
                 .antMatchers("/druid/**").permitAll()
+                //一些自定义的接口，不用登录即可访问
+                .antMatchers("/*/talk/page").permitAll()
+                .antMatchers("/*/talk/getById").permitAll()
+                .antMatchers("/*/users/createUser").permitAll()
                 // 放行OPTIONS请求
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 自定义匿名访问所有url放行：允许匿名和带Token访问，细腻化到每个 Request 类型

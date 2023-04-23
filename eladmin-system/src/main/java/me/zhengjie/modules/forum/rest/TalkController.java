@@ -49,12 +49,15 @@ public class TalkController {
 
     @GetMapping("/page")
     @ApiOperation("1.分页查询；根据关键词、话题搜索帖子")
-    @ApiImplicitParam(name="searchStr",value="搜索条件：关键字")
-    public ResponseEntity<Object> page1(String searchStr, Pageable pageable){
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="searchStr",value="搜索条件：关键字，可为空",type="String"),
+            @ApiImplicitParam(name="userId",value="查看某用户id的帖子，可为空",type = "Long")
+    })
+    public ResponseEntity<Object> page1(String searchStr,Long userId, Pageable pageable){
         if(StringUtils.isEmpty(searchStr)){
             searchStr="";
         }
-        return new ResponseEntity<>(talkService.page1(searchStr,pageable),HttpStatus.OK);
+        return new ResponseEntity<>(talkService.page1(searchStr,userId,pageable),HttpStatus.OK);
     }
 //    @GetMapping
 //    @Log("查询帖子")

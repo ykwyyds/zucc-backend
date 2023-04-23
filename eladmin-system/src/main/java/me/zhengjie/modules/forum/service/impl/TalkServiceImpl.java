@@ -17,15 +17,11 @@ package me.zhengjie.modules.forum.service.impl;
 
 import me.zhengjie.base.CommonConstant;
 import me.zhengjie.base.PageDTO;
-import me.zhengjie.config.FileProperties;
-import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.forum.domain.Talk;
 import me.zhengjie.modules.forum.domain.TalkAgree;
 import me.zhengjie.modules.forum.domain.TalkCollect;
-import me.zhengjie.modules.forum.domain.TalkComment;
 import me.zhengjie.modules.forum.repository.TalkAgreeRepository;
 import me.zhengjie.modules.forum.repository.TalkCollectRepository;
-import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.TalkRepository;
@@ -37,14 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotBlank;
 
 /**
 * @website https://eladmin.vip
@@ -61,12 +53,12 @@ public class TalkServiceImpl implements TalkService {
     private final TalkAgreeRepository talkAgreeRepository;
     private final TalkMapper talkMapper;
     @Override
-    public PageDTO page1(String searchStr, Pageable pageable) {
-        Page<Map<String,Object>> page=talkRepository.page1(searchStr,pageable);
+    public PageDTO page1(String searchStr, Long searchUserId, Pageable pageable) {
+        Page<Map<String,Object>> page=talkRepository.page1(searchStr,searchUserId,pageable);
         List<Map<String,Object>> list=page.getContent();
         List<Map<String,Object>> newList=new ArrayList<>();
         Long userId=null;
-        if(SecurityUtils.getCurrentUser()!=null){
+        if(SecurityUtils.getLoginUser()!=null){
             userId=SecurityUtils.getCurrentUserId();
         }
         for (int i = 0; i <list.size() ; i++) {
@@ -138,6 +130,10 @@ public class TalkServiceImpl implements TalkService {
     @Transactional(rollbackFor = Exception.class)
     public TalkDto create(Talk resources) {
         resources.setUserId(SecurityUtils.getCurrentUserId());
+        resources.setCreateBy(SecurityUtils.getCurrentUsername());
+        resources.setUpdateBy(resources.getCreateBy());
+        resources.setCreateTime(new Timestamp(new Date().getTime()));
+        resources.setUpdateTime(resources.getCreateTime());
         return talkMapper.toDto(talkRepository.save(resources));
     }
 
@@ -147,6 +143,8 @@ public class TalkServiceImpl implements TalkService {
         Talk talk = talkRepository.findById(resources.getId()).orElseGet(Talk::new);
         ValidationUtil.isNull( talk.getId(),"Talk","id",resources.getId());
         talk.copy(resources);
+        talk.setUpdateTime(new Timestamp(new Date().getTime()));
+        talk.setUpdateBy(SecurityUtils.getCurrentUsername());
         talkRepository.save(talk);
     }
 
