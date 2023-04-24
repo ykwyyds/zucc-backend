@@ -15,9 +15,9 @@
 */
 package me.zhengjie.modules.forum.service.impl;
 
+import com.alipay.api.domain.UserIdentity;
 import me.zhengjie.modules.forum.domain.Course;
-import me.zhengjie.utils.ValidationUtil;
-import me.zhengjie.utils.FileUtil;
+import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.CourseRepository;
 import me.zhengjie.modules.forum.service.CourseService;
@@ -28,14 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import me.zhengjie.utils.PageUtil;
-import me.zhengjie.utils.QueryHelp;
-import java.util.List;
-import java.util.Map;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @website https://eladmin.vip
@@ -50,11 +47,6 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
 
-    @Override
-    public Map<String,Object> queryAll(CourseQueryCriteria criteria, Pageable pageable){
-        Page<Course> page = courseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(courseMapper::toDto));
-    }
 
     @Override
     public List<CourseDto> queryAll(CourseQueryCriteria criteria){
@@ -72,6 +64,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CourseDto create(Course resources) {
+        resources.setUserId(SecurityUtils.getCurrentUserId());
         return courseMapper.toDto(courseRepository.save(resources));
     }
 
@@ -91,24 +84,36 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
+
     @Override
-    public void download(List<CourseDto> all, HttpServletResponse response) throws IOException {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (CourseDto course : all) {
-            Map<String,Object> map = new LinkedHashMap<>();
-            map.put("用户id", course.getUserId());
-            map.put("课程名称", course.getCourseName());
-            map.put("是第几节课", course.getCourseCount());
-            map.put("是周几，比如1", course.getCourseWeek());
-            map.put("是周几，比如“周一”", course.getCourseWeekStr());
-            map.put("开始时间， hh-MM格式", course.getCourseBegin());
-            map.put("结束时间， hh-MM格式", course.getCourseEnd());
-            map.put(" createBy",  course.getCreateBy());
-            map.put(" updateBy",  course.getUpdateBy());
-            map.put(" createTime",  course.getCreateTime());
-            map.put(" updateTime",  course.getUpdateTime());
-            list.add(map);
+    public List<Integer> courseCountList(Integer courseWeek) {
+        Long userId= SecurityUtils.getCurrentUserId();
+        List<Integer> list=courseRepository.courseCountList(courseWeek,userId);
+        List<Integer> resultList=new ArrayList<>();
+        for(int i:CourseUtil.courseCount){
+            if(!list.contains(i)){
+                resultList.add(i);
+            }
         }
-        FileUtil.downloadExcel(list, response);
+        return resultList;
     }
+
+    @Override
+    public List<Map<String, Object>> myCourse() {
+        List<Course> list=courseRepository.getByUser(SecurityUtils.getCurrentUserId());
+        List<Map<String, Object>> result=new ArrayList<>();
+        for(int courseCount:CourseUtil.courseCount){
+            Map<String, Object> map=new HashMap<>();
+            map.put(courseCount+"",courseCount);
+            for(Course c:list){
+                if(c.getCourseCount().intValue()==courseCount){
+                    map.put(c.getCourseWeekStr(),c.getCourseName());
+                }
+            }
+            result.add(map);
+        }
+        return result;
+    }
+
+
 }

@@ -28,6 +28,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -43,45 +45,46 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @Log("导出数据")
-    @ApiOperation("导出数据")
-    @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('course:list')")
-    public void exportCourse(HttpServletResponse response, CourseQueryCriteria criteria) throws IOException {
-        courseService.download(courseService.queryAll(criteria), response);
+    @GetMapping("/courseCountList")
+    @ApiOperation("1.新增课程时的[第几节课】下拉列表")
+    @ApiImplicitParam(name="courseWeek",value="周几",type="Integer")
+    public ResponseEntity<List<Integer>> courseCountList(Integer courseWeek){
+        return new ResponseEntity<List<Integer>>(courseService.courseCountList(courseWeek),HttpStatus.OK);
     }
 
-    @GetMapping
-    @Log("查询课程表")
-    @ApiOperation("查询课程表")
-    @PreAuthorize("@el.check('course:list')")
-    public ResponseEntity<Object> queryCourse(CourseQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(courseService.queryAll(criteria,pageable),HttpStatus.OK);
-    }
-
-    @PostMapping
-    @Log("新增课程表")
-    @ApiOperation("新增课程表")
-    @PreAuthorize("@el.check('course:add')")
-    public ResponseEntity<Object> createCourse(@Validated @RequestBody Course resources){
+    @PostMapping("/add")
+    @ApiOperation("2.新增课程表")
+    public ResponseEntity<Object> add( @RequestBody Course resources){
         return new ResponseEntity<>(courseService.create(resources),HttpStatus.CREATED);
     }
 
-    @PutMapping
-    @Log("修改课程表")
-    @ApiOperation("修改课程表")
-    @PreAuthorize("@el.check('course:edit')")
+    @GetMapping("/list")
+    @ApiOperation("3.查询课程表，不分页")
+    public ResponseEntity<Object> list(CourseQueryCriteria criteria){
+        return new ResponseEntity<>(courseService.queryAll(criteria),HttpStatus.OK);
+    }
+
+
+
+    @PutMapping("/updateCourse")
+    @ApiOperation("4.修改课程表")
     public ResponseEntity<Object> updateCourse(@Validated @RequestBody Course resources){
         courseService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping
-    @Log("删除课程表")
-    @ApiOperation("删除课程表")
-    @PreAuthorize("@el.check('course:del')")
+    @DeleteMapping("/deleteCourse")
+    @ApiOperation("5.删除课程表")
     public ResponseEntity<Object> deleteCourse(@RequestBody Long[] ids) {
         courseService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+    @GetMapping("/myCourse")
+    @ApiOperation("6.我的课表")
+    public ResponseEntity<List<Map<String,Object>>> myCourse(){
+        return new ResponseEntity<List<Map<String,Object>>>(courseService.myCourse(),HttpStatus.OK);
+    }
+
 }

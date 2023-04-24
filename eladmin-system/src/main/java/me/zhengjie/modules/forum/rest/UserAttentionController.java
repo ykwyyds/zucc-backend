@@ -19,6 +19,7 @@ import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.forum.domain.UserAttention;
 import me.zhengjie.modules.forum.service.UserAttentionService;
 import me.zhengjie.modules.forum.service.dto.UserAttentionQueryCriteria;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -42,46 +45,22 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAttentionController {
 
     private final UserAttentionService userAttentionService;
-
-    @Log("导出数据")
-    @ApiOperation("导出数据")
-    @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('userAttention:list')")
-    public void exportUserAttention(HttpServletResponse response, UserAttentionQueryCriteria criteria) throws IOException {
-        userAttentionService.download(userAttentionService.queryAll(criteria), response);
+    @PostMapping("/attention")
+    @ApiOperation("1.关注某用户")
+    @ApiImplicitParam(name="userId",value="用户id")
+    public ResponseEntity<Object> add(Long userId){
+        return new ResponseEntity<>(userAttentionService.attention(userId),HttpStatus.OK);
+    }
+    @GetMapping("/list")
+    @ApiOperation("2.关注列表")
+    public ResponseEntity<List<Map<String,Object>>> list(){
+        return new ResponseEntity<>(userAttentionService.list(),HttpStatus.OK);
     }
 
-    @GetMapping
-    @Log("查询关注")
-    @ApiOperation("查询关注")
-    @PreAuthorize("@el.check('userAttention:list')")
-    public ResponseEntity<Object> queryUserAttention(UserAttentionQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(userAttentionService.queryAll(criteria,pageable),HttpStatus.OK);
-    }
-
-    @PostMapping
-    @Log("新增关注")
-    @ApiOperation("新增关注")
-    @PreAuthorize("@el.check('userAttention:add')")
-    public ResponseEntity<Object> createUserAttention(@Validated @RequestBody UserAttention resources){
-        return new ResponseEntity<>(userAttentionService.create(resources),HttpStatus.CREATED);
-    }
-
-    @PutMapping
-    @Log("修改关注")
-    @ApiOperation("修改关注")
-    @PreAuthorize("@el.check('userAttention:edit')")
-    public ResponseEntity<Object> updateUserAttention(@Validated @RequestBody UserAttention resources){
-        userAttentionService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @DeleteMapping
-    @Log("删除关注")
-    @ApiOperation("删除关注")
-    @PreAuthorize("@el.check('userAttention:del')")
-    public ResponseEntity<Object> deleteUserAttention(@RequestBody Long[] ids) {
-        userAttentionService.deleteAll(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PostMapping("/cancel")
+    @ApiOperation("3.取消关注")
+    @ApiImplicitParam(name="userId",value="用户id")
+    public ResponseEntity<Object> del(Long userId){
+        return new ResponseEntity<>(userAttentionService.cancel(userId),HttpStatus.OK);
     }
 }

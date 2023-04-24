@@ -32,13 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 **/
 public interface CourseService {
 
-    /**
-    * 查询数据分页
-    * @param criteria 条件
-    * @param pageable 分页参数
-    * @return Map<String,Object>
-    */
-    Map<String,Object> queryAll(CourseQueryCriteria criteria, Pageable pageable);
 
     /**
     * 查询所有数据不分页
@@ -73,11 +66,8 @@ public interface CourseService {
     */
     void deleteAll(Long[] ids);
 
-    /**
-    * 导出数据
-    * @param all 待导出的数据
-    * @param response /
-    * @throws IOException /
-    */
-    void download(List<CourseDto> all, HttpServletResponse response) throws IOException;
+
+    List<Integer> courseCountList(Integer courseWeek);
+
+    List<Map<String, Object>> myCourse();
 }

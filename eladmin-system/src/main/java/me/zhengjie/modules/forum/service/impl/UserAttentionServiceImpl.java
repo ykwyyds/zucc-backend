@@ -15,9 +15,11 @@
 */
 package me.zhengjie.modules.forum.service.impl;
 
+import me.zhengjie.base.CommonConstant;
+import me.zhengjie.exception.BusinessException;
 import me.zhengjie.modules.forum.domain.UserAttention;
-import me.zhengjie.utils.ValidationUtil;
-import me.zhengjie.utils.FileUtil;
+import me.zhengjie.modules.forum.repository.CourseRepository;
+import me.zhengjie.utils.*;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.modules.forum.repository.UserAttentionRepository;
 import me.zhengjie.modules.forum.service.UserAttentionService;
@@ -28,14 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import me.zhengjie.utils.PageUtil;
-import me.zhengjie.utils.QueryHelp;
-import java.util.List;
-import java.util.Map;
+
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 /**
 * @website https://eladmin.vip
@@ -48,62 +48,59 @@ import java.util.LinkedHashMap;
 public class UserAttentionServiceImpl implements UserAttentionService {
 
     private final UserAttentionRepository userAttentionRepository;
+    private final CourseRepository courseRepository;
     private final UserAttentionMapper userAttentionMapper;
 
     @Override
-    public Map<String,Object> queryAll(UserAttentionQueryCriteria criteria, Pageable pageable){
-        Page<UserAttention> page = userAttentionRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(userAttentionMapper::toDto));
-    }
-
-    @Override
-    public List<UserAttentionDto> queryAll(UserAttentionQueryCriteria criteria){
-        return userAttentionMapper.toDto(userAttentionRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
-    }
-
-    @Override
-    @Transactional
-    public UserAttentionDto findById(Long id) {
-        UserAttention userAttention = userAttentionRepository.findById(id).orElseGet(UserAttention::new);
-        ValidationUtil.isNull(userAttention.getId(),"UserAttention","id",id);
-        return userAttentionMapper.toDto(userAttention);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public UserAttentionDto create(UserAttention resources) {
-        return userAttentionMapper.toDto(userAttentionRepository.save(resources));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(UserAttention resources) {
-        UserAttention userAttention = userAttentionRepository.findById(resources.getId()).orElseGet(UserAttention::new);
-        ValidationUtil.isNull( userAttention.getId(),"UserAttention","id",resources.getId());
-        userAttention.copy(resources);
-        userAttentionRepository.save(userAttention);
-    }
-
-    @Override
-    public void deleteAll(Long[] ids) {
-        for (Long id : ids) {
-            userAttentionRepository.deleteById(id);
+    public Object attention(Long userId) {
+        Long currentUserId= SecurityUtils.getCurrentUserId();
+        UserAttention temp=userAttentionRepository.getByUser(currentUserId,userId);
+        if(temp!=null){
+            throw new BusinessException("您已关注过该用户。");
         }
+        UserAttention a=new UserAttention();
+        a.setUserAttentionId(userId);
+        a.setUserId(currentUserId);
+        a.setCreateBy(SecurityUtils.getCurrentUsername());
+        a.setCreateTime(new Timestamp(new Date().getTime()));
+        a.setUpdateBy(a.getCreateBy());
+        a.setUpdateTime(a.getCreateTime());
+        userAttentionRepository.save(a);
+        return a;
     }
 
     @Override
-    public void download(List<UserAttentionDto> all, HttpServletResponse response) throws IOException {
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (UserAttentionDto userAttention : all) {
-            Map<String,Object> map = new LinkedHashMap<>();
-            map.put("用户id", userAttention.getUserId());
-            map.put("关注的用户id", userAttention.getUserAttentionId());
-            map.put(" createBy",  userAttention.getCreateBy());
-            map.put(" updateBy",  userAttention.getUpdateBy());
-            map.put(" createTime",  userAttention.getCreateTime());
-            map.put(" updateTime",  userAttention.getUpdateTime());
-            list.add(map);
+    public List<Map<String,Object>> list() {
+        Long currentUserId= SecurityUtils.getCurrentUserId();
+        List<Map<String,Object>> list=userAttentionRepository.list(currentUserId);
+        List<Map<String,Object>> resultList=new ArrayList<>();
+        for (int i = 0; i <list.size() ; i++) {
+            Map<String,Object> tempMap=list.get(i);
+            Map<String,Object> map=new HashMap<>();
+            for(String key:tempMap.keySet()){
+                map.put(key,tempMap.get(key));
+            }
+            resultList.add(i,map);
         }
-        FileUtil.downloadExcel(list, response);
+        int week=CourseUtil.getWeekOfDate(new Date());
+        for (int i = 0; i < resultList.size(); i++) {
+            Map<String,Object> m=resultList.get(i);
+            Long userAttentionId= ((BigInteger) m.get("userAttentionId")).longValue();
+            List<Integer> courseList=courseRepository.courseCountList(week,userAttentionId);
+            boolean b=CourseUtil.checkInCourse(courseList);
+            if(b){
+                resultList.get(i).put("isInCourse", CommonConstant.YES);
+            }else{
+                resultList.get(i).put("isInCourse", CommonConstant.NO);
+            }
+        }
+        return resultList;
+    }
+
+    @Override
+    public Object cancel(Long userId) {
+        Long currentUserId= SecurityUtils.getCurrentUserId();
+        userAttentionRepository.cancel(currentUserId,userId);
+        return "取消关注成功。";
     }
 }

@@ -32,52 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 **/
 public interface UserAttentionService {
 
-    /**
-    * 查询数据分页
-    * @param criteria 条件
-    * @param pageable 分页参数
-    * @return Map<String,Object>
-    */
-    Map<String,Object> queryAll(UserAttentionQueryCriteria criteria, Pageable pageable);
+    Object attention(Long userId);
 
-    /**
-    * 查询所有数据不分页
-    * @param criteria 条件参数
-    * @return List<UserAttentionDto>
-    */
-    List<UserAttentionDto> queryAll(UserAttentionQueryCriteria criteria);
+    List<Map<String,Object>> list();
 
-    /**
-     * 根据ID查询
-     * @param id ID
-     * @return UserAttentionDto
-     */
-    UserAttentionDto findById(Long id);
-
-    /**
-    * 创建
-    * @param resources /
-    * @return UserAttentionDto
-    */
-    UserAttentionDto create(UserAttention resources);
-
-    /**
-    * 编辑
-    * @param resources /
-    */
-    void update(UserAttention resources);
-
-    /**
-    * 多选删除
-    * @param ids /
-    */
-    void deleteAll(Long[] ids);
-
-    /**
-    * 导出数据
-    * @param all 待导出的数据
-    * @param response /
-    * @throws IOException /
-    */
-    void download(List<UserAttentionDto> all, HttpServletResponse response) throws IOException;
+    Object cancel(Long userId);
 }
