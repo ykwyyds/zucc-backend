@@ -55,7 +55,7 @@ public class CourseController {
     @PostMapping("/add")
     @ApiOperation("2.新增课程表")
     public ResponseEntity<Object> add( @RequestBody Course resources){
-        return new ResponseEntity<>(courseService.create(resources),HttpStatus.CREATED);
+        return new ResponseEntity<>(courseService.create(resources),HttpStatus.OK);
     }
 
     @GetMapping("/list")
@@ -70,7 +70,7 @@ public class CourseController {
     @ApiOperation("4.修改课程表")
     public ResponseEntity<Object> updateCourse(@Validated @RequestBody Course resources){
         courseService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteCourse")

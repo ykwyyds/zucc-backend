@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.*;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -66,6 +67,8 @@ public class TalkCollectServiceImpl implements TalkCollectService {
         TalkCollect c=new TalkCollect();
         c.setCreateBy(SecurityUtils.getCurrentUsername());
         c.setUpdateBy(c.getCreateBy());
+        c.setCreateTime(new Timestamp(new Date().getTime()));
+        c.setUpdateTime(c.getCreateTime());
         c.setTalkId(talkId);
         c.setUserId(userId);
         talkCollectRepository.save(c);
@@ -118,5 +121,28 @@ public class TalkCollectServiceImpl implements TalkCollectService {
         newPage.setContent(newList);
         newPage.setTotalElements(page.getTotalElements());
         return newPage;
+    }
+
+    @Override
+    public Object agree(Long talkId) {
+        Long userId=SecurityUtils.getCurrentUserId();
+        TalkAgree t=talkAgreeRepository.getByUserAndTalk(talkId,userId);
+        if(t!=null){
+            throw new BusinessException("您已赞过该帖子。");
+        }
+        TalkAgree c=new TalkAgree();
+        c.setCreateBy(SecurityUtils.getCurrentUsername());
+        c.setUpdateBy(c.getCreateBy());
+        c.setTalkId(talkId);
+        c.setUserId(userId);
+        talkAgreeRepository.save(c);
+        return c;
+    }
+
+    @Override
+    public Object cancelAgree(Long talkId) {
+        Long userId=SecurityUtils.getCurrentUserId();
+        talkAgreeRepository.cancelAgree(userId,talkId);
+        return "取消点赞成功。";
     }
 }

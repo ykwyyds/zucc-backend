@@ -65,6 +65,13 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(rollbackFor = Exception.class)
     public CourseDto create(Course resources) {
         resources.setUserId(SecurityUtils.getCurrentUserId());
+        int c=resources.getCourseCount();
+        String time=CourseUtil.courseTime[c+1];
+        String begin=time.split("~")[0];
+        String end=time.split("~")[1];
+        resources.setCourseBegin(begin);
+        resources.setCourseEnd(end);
+        resources.setCourseWeekStr(CourseUtil.getWeekStr(resources.getCourseWeek()));
         return courseMapper.toDto(courseRepository.save(resources));
     }
 
@@ -74,6 +81,13 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(resources.getId()).orElseGet(Course::new);
         ValidationUtil.isNull( course.getId(),"Course","id",resources.getId());
         course.copy(resources);
+        int c=resources.getCourseCount();
+        String time=CourseUtil.courseTime[c+1];
+        String begin=time.split("~")[0];
+        String end=time.split("~")[1];
+        course.setCourseBegin(begin);
+        course.setCourseEnd(end);
+        course.setCourseWeekStr(CourseUtil.getWeekStr(resources.getCourseWeek()));
         courseRepository.save(course);
     }
 

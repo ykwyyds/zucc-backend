@@ -122,4 +122,6 @@ public interface UserService {
      * @param resources /
      */
     void updateCenter(User resources);
+
+    User getById(Long userId);
 }

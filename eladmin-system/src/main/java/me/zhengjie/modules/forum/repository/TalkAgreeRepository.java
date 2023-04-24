@@ -19,17 +19,26 @@ import me.zhengjie.modules.forum.domain.TalkAgree;
 import me.zhengjie.modules.forum.domain.TalkCollect;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
 * @website https://eladmin.vip
 * @author cuican
 * @date 2023-04-20
 **/
+@Transactional
 public interface TalkAgreeRepository extends JpaRepository<TalkAgree, Long>, JpaSpecificationExecutor<TalkAgree> {
     @Query(value = "select t.* from talk_agree t where t.user_id=:userId and talk_id=:talkId "
             , nativeQuery = true
     )
     TalkAgree getByUserAndTalk(@Param("talkId") Long talkId,@Param("userId")  Long userId);
+
+    @Modifying
+    @Query(value = "delete from talk_agree where user_id=:userId and talk_id=:talkId"
+            , nativeQuery = true
+    )
+    void cancelAgree(@Param("userId")Long userId, @Param("talkId")Long talkId);
 }

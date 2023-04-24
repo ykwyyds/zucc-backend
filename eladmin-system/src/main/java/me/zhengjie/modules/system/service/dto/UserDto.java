@@ -52,6 +52,7 @@ public class UserDto extends BaseDTO implements Serializable {
     private String gender;
 
     private String avatarName;
+    private String memo;
 
     private String avatarPath;
 

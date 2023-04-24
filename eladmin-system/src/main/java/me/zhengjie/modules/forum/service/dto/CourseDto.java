@@ -59,4 +59,7 @@ public class CourseDto implements Serializable {
     private Timestamp createTime;
 
     private Timestamp updateTime;
+
+    private String place;
+    private String teacher;
 }

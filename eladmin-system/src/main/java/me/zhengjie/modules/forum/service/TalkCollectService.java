@@ -40,4 +40,8 @@ public interface TalkCollectService {
     Object cancel(Long id);
 
     PageDTO myCollectPage(String searchStr, Pageable pageable);
+
+    Object agree(Long talkId);
+
+    Object cancelAgree(Long talkId);
 }

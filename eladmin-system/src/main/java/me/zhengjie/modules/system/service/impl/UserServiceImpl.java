@@ -158,6 +158,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getById(Long userId) {
+        return userRepository.getById(userId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {

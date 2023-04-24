@@ -70,4 +70,19 @@ public class TalkCollectController {
     public ResponseEntity<Object> cancel(Long talkId){
         return new ResponseEntity<>(talkCollectService.cancel(talkId),HttpStatus.OK);
     }
+
+    @PostMapping("/agree")
+    @ApiOperation("4.点赞")
+    @ApiImplicitParam(name="talkId",value="帖子id")
+    public ResponseEntity<Object> agree(Long talkId){
+        return new ResponseEntity<>(talkCollectService.agree(talkId),HttpStatus.OK);
+    }
+
+    @PostMapping("/cancelAgree")
+    @ApiOperation("5.取消点赞")
+    @ApiImplicitParam(name="talkId",value="帖子id")
+    public ResponseEntity<Object> cancelAgree(Long talkId){
+        return new ResponseEntity<>(talkCollectService.cancelAgree(talkId),HttpStatus.OK);
+    }
+
 }

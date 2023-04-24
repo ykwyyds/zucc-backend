@@ -74,9 +74,9 @@ public class UserController {
         userService.download(userService.queryAll(criteria), response);
     }
 
-    @ApiOperation("查询用户")
-    @GetMapping
-    @PreAuthorize("@el.check('user:list')")
+//    @ApiOperation("查询用户")
+//    @GetMapping
+//    @PreAuthorize("@el.check('user:list')")
     public ResponseEntity<Object> queryUser(UserQueryCriteria criteria, Pageable pageable){
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
@@ -127,6 +127,12 @@ public class UserController {
         userService.update(resources);
         return new ResponseEntity<>("修改成功。",HttpStatus.OK);
     }
+    @ApiOperation("3.根据用户id查询")
+    @GetMapping("/getById")
+    public ResponseEntity<Object> getById( Long userId) throws Exception {
+        User u=userService.getById(userId);
+        return new ResponseEntity<>(u,HttpStatus.OK);
+    }
 
 //    @Log("修改用户：个人中心")
     @ApiOperation("修改用户：个人中心")
@@ -136,7 +142,7 @@ public class UserController {
             throw new BadRequestException("不能修改他人资料");
         }
         userService.updateCenter(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Log("删除用户")

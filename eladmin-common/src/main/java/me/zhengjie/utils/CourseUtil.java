@@ -13,6 +13,13 @@ public class CourseUtil {
     public static String[] courseTime=new String[]{
             "08:00~08:50","08:50~09:50","09:50~10:40","10:40~11:40","11:40~12:25","13:30~14:20","14:20~15:20","15:20~16:10","16:10~17:10","18:30~19:20","19:20~20:05"
     };
+    public static String[] weeks=new String[]{
+    "周一","周二","周三","周四","周五","周六","周日"
+    };
+
+    public static String getWeekStr(int week){
+        return weeks[week-1];
+    }
     public static int getWeekOfDate(Date date) {
         int[] weekOfDaysNum = { 7, 1, 2, 3, 4, 5, 6 };
         Calendar calendar = Calendar.getInstance();
@@ -25,7 +32,12 @@ public class CourseUtil {
         }
         return weekOfDaysNum[w];
     }
-    //检测当前时间是否在上课中
+
+    /**
+     * 检测当前时间是否在上课中
+     * @param todayCourseCount 当天需要上课的节数
+     * @return
+     */
     public static boolean checkInCourse(List<Integer> todayCourseCount){
         boolean b=false;
         Date now=new Date();
