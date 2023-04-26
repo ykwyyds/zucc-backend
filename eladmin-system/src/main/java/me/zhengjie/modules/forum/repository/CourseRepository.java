@@ -42,4 +42,6 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
     @Query(value="select * from course where user_id=:userId order by course_week,course_count",nativeQuery=true )
     List<Course> getByUser(@Param("userId")Long userId);
 
+    @Query(value="select * from course where user_id=:userId and course_week=:courseWeek order by course_count asc ",nativeQuery=true )
+    List<Course> getByWeekAndUser(@Param("courseWeek") Integer courseWeek, @Param("userId")Long userId);
 }

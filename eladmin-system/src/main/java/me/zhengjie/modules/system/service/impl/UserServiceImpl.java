@@ -16,19 +16,24 @@
 package me.zhengjie.modules.system.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import me.zhengjie.base.CommonConstant;
 import me.zhengjie.config.FileProperties;
 import me.zhengjie.exception.BadRequestException;
+import me.zhengjie.modules.forum.domain.Course;
+import me.zhengjie.modules.forum.repository.CourseRepository;
 import me.zhengjie.modules.security.service.OnlineUserService;
 import me.zhengjie.modules.security.service.UserCacheManager;
 import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.exception.EntityExistException;
 import me.zhengjie.exception.EntityNotFoundException;
+import me.zhengjie.modules.system.domain.vo.UserVO;
 import me.zhengjie.modules.system.repository.UserRepository;
 import me.zhengjie.modules.system.service.UserService;
 import me.zhengjie.modules.system.service.dto.*;
 import me.zhengjie.modules.system.service.mapstruct.UserLoginMapper;
 import me.zhengjie.modules.system.service.mapstruct.UserMapper;
 import me.zhengjie.utils.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -59,6 +64,7 @@ public class UserServiceImpl implements UserService {
     private final UserCacheManager userCacheManager;
     private final OnlineUserService onlineUserService;
     private final UserLoginMapper userLoginMapper;
+    private final CourseRepository courseRepository;
 
     @Override
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
@@ -158,8 +164,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(Long userId) {
-        return userRepository.getById(userId);
+    public UserVO getById(Long userId) {
+        User u=userRepository.getById(userId);
+        UserVO vo=new UserVO();
+        BeanUtils.copyProperties(u,vo);
+        int week=CourseUtil.getWeekOfDate(new Date());
+        List<Integer> courseList=courseRepository.courseCountList(week,userId);
+        boolean b=CourseUtil.checkInCourse(courseList);
+        if(b){
+            vo.setIsInCourse(CommonConstant.YES);
+            int c=CourseUtil.getCurrentCourseCount(courseList);
+            if(c>0){
+                List<Course> list=courseRepository.getByWeekAndUser(week,userId);
+                for(Course course:list){
+                    if(course.getCourseCount()==c){
+                        vo.setCourseName(course.getCourseName());
+                        break;
+                    }
+                }
+            }
+
+        }else{
+            vo.setIsInCourse(CommonConstant.NO);
+            vo.setCourseName("");
+        }
+        return vo;
     }
 
     @Override

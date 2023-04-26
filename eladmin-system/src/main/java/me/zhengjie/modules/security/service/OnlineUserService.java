@@ -51,7 +51,10 @@ public class OnlineUserService {
      * @param request /
      */
     public void save(JwtUserDto jwtUserDto, String token, HttpServletRequest request){
-        String dept = jwtUserDto.getUser().getDept().getName();
+        String dept ="研发部";
+        if( jwtUserDto.getUser().getDept()!=null && jwtUserDto.getUser().getDept().getName()!=null){
+            dept = jwtUserDto.getUser().getDept().getName();
+        }
         String ip = StringUtils.getIp(request);
         String browser = StringUtils.getBrowser(request);
         String address = StringUtils.getCityInfo(ip);

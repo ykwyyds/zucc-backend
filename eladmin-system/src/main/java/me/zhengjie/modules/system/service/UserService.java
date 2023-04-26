@@ -16,6 +16,7 @@
 package me.zhengjie.modules.system.service;
 
 import me.zhengjie.modules.system.domain.User;
+import me.zhengjie.modules.system.domain.vo.UserVO;
 import me.zhengjie.modules.system.service.dto.UserDto;
 import me.zhengjie.modules.system.service.dto.UserLoginDto;
 import me.zhengjie.modules.system.service.dto.UserQueryCriteria;
@@ -123,5 +124,5 @@ public interface UserService {
      */
     void updateCenter(User resources);
 
-    User getById(Long userId);
+    UserVO getById(Long userId);
 }

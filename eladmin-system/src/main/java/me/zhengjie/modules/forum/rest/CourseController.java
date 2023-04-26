@@ -84,7 +84,8 @@ public class CourseController {
     @GetMapping("/myCourse")
     @ApiOperation("6.我的课表")
     public ResponseEntity<List<Map<String,Object>>> myCourse(){
-        return new ResponseEntity<List<Map<String,Object>>>(courseService.myCourse(),HttpStatus.OK);
+        List<Map<String,Object>> list=courseService.myCourse();
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 
 }

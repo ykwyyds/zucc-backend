@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
 import me.zhengjie.config.RsaProperties;
 import me.zhengjie.modules.system.domain.Dept;
+import me.zhengjie.modules.system.domain.vo.UserVO;
 import me.zhengjie.modules.system.service.DataService;
 import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.exception.BadRequestException;
@@ -129,8 +130,8 @@ public class UserController {
     }
     @ApiOperation("3.根据用户id查询")
     @GetMapping("/getById")
-    public ResponseEntity<Object> getById( Long userId) throws Exception {
-        User u=userService.getById(userId);
+    public ResponseEntity<UserVO> getById(Long userId) throws Exception {
+        UserVO u=userService.getById(userId);
         return new ResponseEntity<>(u,HttpStatus.OK);
     }
 

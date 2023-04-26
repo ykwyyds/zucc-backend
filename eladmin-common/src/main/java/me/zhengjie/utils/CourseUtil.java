@@ -41,7 +41,6 @@ public class CourseUtil {
     public static boolean checkInCourse(List<Integer> todayCourseCount){
         boolean b=false;
         Date now=new Date();
-        int week=getWeekOfDate(now);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         String hhmm= sdf.format(now);
 //        if(week>=1 && week<=5){
@@ -56,5 +55,28 @@ public class CourseUtil {
         }
 //        }
         return b;
+    }
+
+    /**
+     * 当前上的是第几节课
+     * @param todayCourseCount
+     * @return
+     */
+    public static int getCurrentCourseCount(List<Integer> todayCourseCount){
+        if(checkInCourse(todayCourseCount)){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            Date now=new Date();
+            String hhmm= sdf.format(now);
+            for(int c:todayCourseCount){
+                String time=courseTime[c-1];
+                String[] times=time.split("~");
+                String begin=times[0];
+                String end=times[1];
+                if(hhmm.compareTo(begin)>0 && hhmm.compareTo(end)<0){
+                    return c;
+                }
+            }
+        }
+        return -1;
     }
 }
