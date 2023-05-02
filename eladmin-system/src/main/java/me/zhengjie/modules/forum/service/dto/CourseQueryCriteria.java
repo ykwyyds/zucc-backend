@@ -26,4 +26,6 @@ import me.zhengjie.annotation.Query;
 **/
 @Data
 public class CourseQueryCriteria{
+    @Query(type = Query.Type.INNER_LIKE)
+    private Long userId;
 }

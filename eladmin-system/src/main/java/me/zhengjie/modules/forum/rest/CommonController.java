@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import me.zhengjie.annotation.Log;
+import me.zhengjie.base.CommonConstant;
 import me.zhengjie.config.FileProperties;
 import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.modules.forum.domain.Talk;
@@ -61,6 +62,7 @@ public class CommonController {
         }
         File file = FileUtil.upload(multipartFile, properties.getPath().getAvatar());
         String path=file.getPath();
+        path=path.replace(properties.getPath().getAvatar(), CommonConstant.localhost_avatar);
         return new ResponseEntity<>(path, HttpStatus.OK);
     }
 }

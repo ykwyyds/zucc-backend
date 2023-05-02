@@ -19,6 +19,7 @@ import me.zhengjie.annotation.Log;
 import me.zhengjie.modules.forum.domain.Course;
 import me.zhengjie.modules.forum.service.CourseService;
 import me.zhengjie.modules.forum.service.dto.CourseQueryCriteria;
+import me.zhengjie.utils.SecurityUtils;
 import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,7 @@ public class CourseController {
     @GetMapping("/list")
     @ApiOperation("3.查询课程表，不分页")
     public ResponseEntity<Object> list(CourseQueryCriteria criteria){
+        criteria.setUserId(SecurityUtils.getCurrentUserId());
         return new ResponseEntity<>(courseService.queryAll(criteria),HttpStatus.OK);
     }
 

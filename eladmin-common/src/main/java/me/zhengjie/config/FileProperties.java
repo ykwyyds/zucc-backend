@@ -50,6 +50,7 @@ public class FileProperties {
         return linux;
     }
 
+
     @Data
     public static class ElPath{
 

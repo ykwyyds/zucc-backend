@@ -133,15 +133,34 @@ public class UserServiceImpl implements UserService {
         if(resources.getEnabled()!=null && !resources.getEnabled()){
             onlineUserService.kickOutForUsername(resources.getUsername());
         }
-        user.setUsername(resources.getUsername());
+        if(resources.getUsername()!=null && !"".equals(resources.getUsername())){
+            user.setUsername(resources.getUsername());
+        }
+
         user.setEmail(resources.getEmail());
-        user.setEnabled(resources.getEnabled());
+        if(resources.getEnabled()!=null){
+            user.setEnabled(resources.getEnabled());
+        }
+
         user.setRoles(resources.getRoles());
         user.setDept(resources.getDept());
         user.setJobs(resources.getJobs());
         user.setPhone(resources.getPhone());
-        user.setNickName(resources.getNickName());
-        user.setGender(resources.getGender());
+        if(resources.getNickName()!=null && !"".equals(resources.getNickName())){
+            user.setNickName(resources.getNickName());
+        }
+        if(resources.getGender()!=null && !"".equals(resources.getGender())){
+            user.setGender(resources.getGender());
+        }
+        if(resources.getMemo()!=null){
+            user.setMemo(resources.getMemo());
+        }
+        if(resources.getAvatarPath()!=null){
+            user.setAvatarPath(resources.getAvatarPath());
+            String[] ss=resources.getAvatarPath().split("\\\\");
+            user.setAvatarName(ss[ss.length-1]);
+        }
+
         userRepository.save(user);
         // 清除缓存
         delCaches(user.getId(), user.getUsername());
@@ -187,6 +206,9 @@ public class UserServiceImpl implements UserService {
         }else{
             vo.setIsInCourse(CommonConstant.NO);
             vo.setCourseName("");
+        }
+        if(vo.getAvatarPath()!=null){
+            vo.setAvatarPath(CommonConstant.localhost_avatar+vo.getAvatarName());
         }
         return vo;
     }
